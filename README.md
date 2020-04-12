@@ -1,1 +1,1 @@
-# РАСПОЗНАВАНИЕ В ИНТЕЛЛЕКТУАЛЬНЫХ СИСТЕМАХ
+# РRECOGNITION IN INTELLECTUAL SYSTEMS
