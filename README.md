@@ -1,2 +1,2 @@
 # cluster-analysis
-Recognition in intellectual systems
+РАСПОЗНАВАНИЕ В ИНТЕЛЛЕКТУАЛЬНЫХ СИСТЕМАХ
