@@ -7,7 +7,7 @@
             rel="stylesheet"
             href="https://unpkg.com/buefy/dist/buefy.min.css"
         />
-        <link 
+        <link
             rel="stylesheet"
             href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css"
         />
@@ -24,9 +24,12 @@
                         <br />
                         Clustering Threshold Method
                         <br />
-                        The distance between the images is Euclidean and the method of domination
+                        The distance between the images is Euclidean and the
+                        method of domination
                         <br />
-                        The distance between the image and the cluster - to the center of the cluster and to the near image of the cluster
+                        The distance between the image and the cluster - to the
+                        center of the cluster and to the near image of the
+                        cluster
                         <br />
                         Cluster Spacing - None
                     </p>
@@ -46,12 +49,24 @@
                                         label: 'X1'
                                     },
                                     {
+                                        field: 'x1n',
+                                        label: 'X1 normalize'
+                                    },
+                                    {
                                         field: 'x2',
                                         label: 'X2'
                                     },
                                     {
+                                        field: 'x2n',
+                                        label: 'X2 normalize'
+                                    },
+                                    {
                                         field: 'x3',
                                         label: 'X3'
+                                    },
+                                    {
+                                        field: 'x3n',
+                                        label: 'X3 normalize'
                                     },
                                 ]"
                             />
@@ -62,35 +77,83 @@
                             class="card-header"
                             :style="{ padding: '10px 20px', alignItems: 'center' }"
                         >
-                            <b-field label="Distance between images">
-                                <b-select v-model="calcTypes[0]" @input="threshold = calcTypes[0] ? 100 : 10">
-                                    <option :value="true">
-                                        Euclidean
-                                    </option>
-                                    <option :value="false">
-                                        Domination method
-                                    </option>
-                                </b-select>
-                            </b-field>
-                            <b-field
-                                label="Distance between the image and the cluster"
-                                :style="{ marginLeft: '20px' }"
-                            >
-                                <b-select v-model="calcTypes[1]">
-                                    <option :value="true">
-                                        To the center of cluster
-                                    </option>
-                                    <option :value="false">
-                                        To near cluster image
-                                    </option>
-                                </b-select>
-                            </b-field>
-                            <b-field
-                                label="Distance threshold"
-                                :style="{ marginLeft: '20px' }"
-                            >
-                                <b-numberinput v-model="threshold" :min="0" :step="5" />
-                            </b-field>
+                            <div :style="{ marginRight: '30px' }">
+                                <b-field label="Distance between images">
+                                    <b-select
+                                        v-model="calcTypes[0]"
+                                        @input="threshold = calcTypes[0] ? 100 : 10"
+                                    >
+                                        <option :value="true">
+                                            Euclidean
+                                        </option>
+                                        <option :value="false">
+                                            Domination method
+                                        </option>
+                                    </b-select>
+                                </b-field>
+                                <b-field
+                                    label="Distance between the image and the cluster"
+                                >
+                                    <b-select v-model="calcTypes[1]">
+                                        <option :value="true">
+                                            To the center of cluster
+                                        </option>
+                                        <option :value="false">
+                                            To near cluster image
+                                        </option>
+                                    </b-select>
+                                </b-field>
+                            </div>
+                            <div :style="{ marginRight: '30px' }">
+                                <div class="field">
+                                    <b-switch
+                                        v-model="calcNormalValues"
+                                        :true-value="true"
+                                        :false-value="false"
+                                    >
+                                        Calculation of normalized values
+                                    </b-switch>
+                                </div>
+                                <div class="field">
+                                    <b-switch
+                                        v-model="calcWithWeight"
+                                        :true-value="true"
+                                        :false-value="false"
+                                    >
+                                        Consider weight values
+                                    </b-switch>
+                                </div>
+                                <b-field label="Distance threshold">
+                                    <b-numberinput
+                                        v-model="threshold"
+                                        :step="0.1"
+                                        :min="0"
+                                    />
+                                </b-field>
+                            </div>
+                            <div>
+                                <b-field label="Weight x1">
+                                    <b-numberinput
+                                        v-model="weight[0]"
+                                        :min="0"
+                                        :step="1"
+                                    />
+                                </b-field>
+                                <b-field label="Weight x2">
+                                    <b-numberinput
+                                        v-model="weight[1]"
+                                        :min="0"
+                                        :step="1"
+                                    />
+                                </b-field>
+                                <b-field label="Weight x3">
+                                    <b-numberinput
+                                        v-model="weight[2]"
+                                        :min="0"
+                                        :step="1"
+                                    />
+                                </b-field>
+                            </div>
                             <b-button
                                 type="is-primary"
                                 :style="{ marginLeft: 'auto' }"
@@ -114,12 +177,24 @@
                                         label: 'X1'
                                     },
                                     {
+                                        field: 'x1n',
+                                        label: 'X1 normalize'
+                                    },
+                                    {
                                         field: 'x2',
                                         label: 'X2'
                                     },
                                     {
+                                        field: 'x2n',
+                                        label: 'X2 normalize'
+                                    },
+                                    {
                                         field: 'x3',
                                         label: 'X3'
+                                    },
+                                    {
+                                        field: 'x3n',
+                                        label: 'X3 normalize'
                                     },
                                 ]"
                                 :style="{ marginBottom: '30px' }"
@@ -137,36 +212,36 @@
                 data: () => ({
                     //  Исходный состав множества
                     bunch: [
-                        {   id: 1,    x1: 0,      x2: 1,      x3: 1     },
-                        {   id: 2,    x1: 0,      x2: 1,      x3: 7     },
-                        {   id: 3,    x1: 5,      x2: 7,      x3: 4     },
-                        {   id: 4,    x1: 0,      x2: 5,      x3: 5     },
-                        {   id: 5,    x1: 9,      x2: 4,      x3: 5     },
-                        {   id: 6,    x1: 7,      x2: 1,      x3: 2     },
-                        {   id: 7,    x1: 10,     x2: 0,      x3: 19    },
-                        {   id: 8,    x1: 0,      x2: 12,     x3: 7     },
-                        {   id: 9,    x1: -5,     x2: -4,     x3: 5     },
-                        {   id: 10,   x1: 20,     x2: 10,     x3: 15    },
-                        {   id: 11,   x1: 0,      x2: 16,     x3: -16   },
-                        {   id: 12,   x1: -1,     x2: 9,      x3: -30   },
-                        {   id: 13,   x1: 18,     x2: 0,      x3: 17    },
-                        {   id: 14,   x1: 6,      x2: 18,     x3: 4     },
-                        {   id: 15,   x1: 17,     x2: 0,      x3: 11    },
-                        {   id: 16,   x1: 14,     x2: 16,     x3: 18    },
-                        {   id: 17,   x1: 5,      x2: 13,     x3: 0     },
-                        {   id: 18,   x1: -5,     x2: -4,     x3: 0     },
-                        {   id: 19,   x1: 5,      x2: 15,     x3: -11   },
-                        {   id: 20,   x1: -3,     x2: 10,     x3: -35   },
-                        {   id: 21,   x1: 16,     x2: 2,      x3: 15    },
-                        {   id: 22,   x1: 6,      x2: 15,     x3: 3     },
-                        {   id: 23,   x1: -9,     x2: -2,     x3: 5     },
-                        {   id: 24,   x1: 0,      x2: 0,      x3: 3     },
-                        {   id: 25,   x1: 19,     x2: 17,     x3: 11    },
-                        {   id: 26,   x1: 6,      x2: 13,     x3: -14   },
-                        {   id: 27,   x1: -4,     x2: 5,      x3: -25   },
-                        {   id: 28,   x1: 15,     x2: 12,     x3: 20    },
-                        {   id: 29,   x1: -2,     x2: 10,     x3: -32   },
-                        {   id: 30,   x1: 7,      x2: 2,      x3: 0     },
+                        { id: 1, x1: 0, x2: 1, x3: 1 },
+                        { id: 2, x1: 0, x2: 1, x3: 7 },
+                        { id: 3, x1: 5, x2: 7, x3: 4 },
+                        { id: 4, x1: 0, x2: 5, x3: 5 },
+                        { id: 5, x1: 9, x2: 4, x3: 5 },
+                        { id: 6, x1: 7, x2: 1, x3: 2 },
+                        { id: 7, x1: 10, x2: 0, x3: 19 },
+                        { id: 8, x1: 0, x2: 12, x3: 7 },
+                        { id: 9, x1: -5, x2: -4, x3: 5 },
+                        { id: 10, x1: 20, x2: 10, x3: 15 },
+                        { id: 11, x1: 0, x2: 16, x3: -16 },
+                        { id: 12, x1: -1, x2: 9, x3: -30 },
+                        { id: 13, x1: 18, x2: 0, x3: 17 },
+                        { id: 14, x1: 6, x2: 18, x3: 4 },
+                        { id: 15, x1: 17, x2: 0, x3: 11 },
+                        { id: 16, x1: 14, x2: 16, x3: 18 },
+                        { id: 17, x1: 5, x2: 13, x3: 0 },
+                        { id: 18, x1: -5, x2: -4, x3: 0 },
+                        { id: 19, x1: 5, x2: 15, x3: -11 },
+                        { id: 20, x1: -3, x2: 10, x3: -35 },
+                        { id: 21, x1: 16, x2: 2, x3: 15 },
+                        { id: 22, x1: 6, x2: 15, x3: 3 },
+                        { id: 23, x1: -9, x2: -2, x3: 5 },
+                        { id: 24, x1: 0, x2: 0, x3: 3 },
+                        { id: 25, x1: 19, x2: 17, x3: 11 },
+                        { id: 26, x1: 6, x2: 13, x3: -14 },
+                        { id: 27, x1: -4, x2: 5, x3: -25 },
+                        { id: 28, x1: 15, x2: 12, x3: 20 },
+                        { id: 29, x1: -2, x2: 10, x3: -32 },
+                        { id: 30, x1: 7, x2: 2, x3: 0 },
                     ],
                     /*
                         calcTypes[0] - тип расчета расстояния
@@ -178,14 +253,54 @@
                         false - центральный образ
                     */
                     calcTypes: [true, false],
+                    // Использовать ли нормированные значени
+                    calcNormalValues: false,
+                    // Учитывать ли весовые значения
+                    calcWithWeight: false,
+                    // Дефолтные весовые значения
+                    weight: [2, 2, 2],
                     // пороговое значение
                     threshold: 100,
                     // массив результирующих кластеров
-                    clusters: []
+                    clusters: [],
                 }),
                 created() {
+                    // Функция для расчета нормированного значения признака
+                    const getNormalVal = (x, xMax, xMin) =>
+                        parseFloat(((x - xMin) / (xMax - xMin)).toFixed(3));
+                    // Получение максимальных и минимальных значений признаков
+                    const x1Max = Math.max.apply(
+                        null,
+                        this.bunch.map((b) => b.x1),
+                    );
+                    const x1Min = Math.min.apply(
+                        null,
+                        this.bunch.map((b) => b.x1),
+                    );
+                    const x2Max = Math.max.apply(
+                        null,
+                        this.bunch.map((b) => b.x2),
+                    );
+                    const x2Min = Math.min.apply(
+                        null,
+                        this.bunch.map((b) => b.x2),
+                    );
+                    const x3Max = Math.max.apply(
+                        null,
+                        this.bunch.map((b) => b.x3),
+                    );
+                    const x3Min = Math.min.apply(
+                        null,
+                        this.bunch.map((b) => b.x3),
+                    );
+                    // Цикличный проход по множеству для расчета нормированных значений
+                    this.bunch.forEach((b) => {
+                        b.x1n = getNormalVal(b.x1, x1Max, x1Min);
+                        b.x2n = getNormalVal(b.x2, x2Max, x2Min);
+                        b.x3n = getNormalVal(b.x3, x3Max, x3Min);
+                    });
                     // запуск рсчета
-                    this.init()
+                    this.init();
                 },
                 methods: {
                     /*
@@ -195,14 +310,36 @@
                         иначе возвращается "доминирующее" расстояние
                     */
                     getDistance(Mx, My) {
+                        /*
+                            Определяем какие значения будем использовать
+                            обычные или нормированные
+                        */
+                        const M1 = {
+                            x1: !this.calcNormalValues ? Mx.x1 : Mx.x1n,
+                            x2: !this.calcNormalValues ? Mx.x2 : Mx.x2n,
+                            x3: !this.calcNormalValues ? Mx.x3 : Mx.x3n,
+                        };
+                        const M2 = {
+                            x1: !this.calcNormalValues ? My.x1 : My.x1n,
+                            x2: !this.calcNormalValues ? My.x2 : My.x2n,
+                            x3: !this.calcNormalValues ? My.x3 : My.x3n,
+                        };
+                        /*
+                            Установка весовых значенй
+                            [1, 1, 1] === NULL
+                        */
+                        const weight = this.calcWithWeight
+                            ? [1, 1, 1]
+                            : this.weight;
+
                         return this.calcTypes[0]
-                            ? Math.pow(Mx.x1 - My.x1, 2) +
-                                Math.pow(Mx.x2 - My.x2, 2) +
-                                  Math.pow(Mx.x3 - My.x3, 2)
+                            ? weight[0] * Math.pow(M1.x1 - M2.x1, 2) +
+                                  weight[1] * Math.pow(M1.x2 - M2.x2, 2) +
+                                    weight[2] * Math.pow(M1.x3 - M2.x3, 2)
                             : Math.max(
-                                  Math.abs(Mx.x1 - My.x1),
-                                  Math.abs(Mx.x2 - My.x2),
-                                  Math.abs(Mx.x3 - My.x3),
+                                  Math.abs(weight[0] * (M1.x1 - M2.x1)),
+                                  Math.abs(weight[1] * (M1.x2 - M2.x2)),
+                                  Math.abs(weight[2] * (M1.x3 - M2.x3))
                               );
                     },
                     /*
@@ -214,35 +351,35 @@
                     getClusterCenter(cluster) {
                         return this.calcTypes[1]
                             ? cluster[0]
-                            : cluster[Math.round(cluster.length / 2 - 1)]
+                            : cluster[Math.round(cluster.length / 2 - 1)];
                     },
                     /*
                         !!Расчет кластеров!!
                     */
                     init() {
-                        this.clusters = []
+                        this.clusters = [];
                         // проход по массиву образов
                         this.bunch.forEach((Mx) => {
                             // Mx - текущий образ в итерации
                             // если массив кластеров пуст
-                            if (!this.clusters.length) this.clusters.push([Mx])
+                            if (!this.clusters.length) this.clusters.push([Mx]);
                             // иначе идём по массиву кластеров
                             else {
                                 for (let i = 0; i < this.clusters.length; i++) {
                                     // получим кластер
-                                    const cluster = this.clusters[i]
+                                    const cluster = this.clusters[i];
                                     // получим центр кластера
-                                    const My = this.getClusterCenter(cluster)
+                                    const My = this.getClusterCenter(cluster);
                                     // получим дистацию между образом и кластером
-                                    const distance = this.getDistance(Mx, My)
+                                    const distance = this.getDistance(Mx, My);
                                     /*
                                         если расстоение между образом и кластером
                                         не привышает пороговое значение
                                         то добавляем образ в кластер и выходим из цикла кластеров
                                     */
                                     if (distance <= this.threshold) {
-                                        this.clusters[i].push(Mx)
-                                        break
+                                        this.clusters[i].push(Mx);
+                                        break;
                                     }
                                     /*
                                         если это конец прохода по массиву кластеров
@@ -250,15 +387,15 @@
                                         то создаем новый кластер
                                     */
                                     if (i === this.clusters.length - 1) {
-                                        this.clusters.push([Mx])
-                                        break
+                                        this.clusters.push([Mx]);
+                                        break;
                                     }
                                 }
                             }
-                        })
-                    }
+                        });
+                    },
                 },
-            })
+            });
         </script>
-    </body> 
+    </body>
 </html>
