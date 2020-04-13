@@ -333,13 +333,13 @@
                             : this.weight;
 
                         return this.calcTypes[0]
-                            ? weight[0] * Math.pow(M1.x1 - M2.x1, 2) +
-                                  weight[1] * Math.pow(M1.x2 - M2.x2, 2) +
-                                    weight[2] * Math.pow(M1.x3 - M2.x3, 2)
+                            ? Math.pow(weight[0] * (M1.x1 - M2.x1), 2) +
+                                Math.pow(weight[1] * (M1.x2 - M2.x2), 2) +
+                                  Math.pow(weight[2] * (M1.x3 - M2.x3), 2)
                             : Math.max(
                                   Math.abs(weight[0] * (M1.x1 - M2.x1)),
                                   Math.abs(weight[1] * (M1.x2 - M2.x2)),
-                                  Math.abs(weight[2] * (M1.x3 - M2.x3))
+                                  Math.abs(weight[2] * (M1.x3 - M2.x3)),
                               );
                     },
                     /*
